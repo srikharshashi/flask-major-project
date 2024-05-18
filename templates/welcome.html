@@ -1,14 +1,26 @@
-<!DOCTYPE html>
-<html>
-<head>
-	<title>Welcome</title>
-	<link rel="stylesheet" type="text/css" href="{{url_for('static', filename = 'welcome.css')}}">
- 	<link rel="stylesheet" type="text/css" href="../static/welcome.css">
-</head>
-<body>
-<div class="main">
-	<h1 class="name">Hi, {{name}}</h1><hr style="width: 30%">
-	<h3 class="email">{{email}}</h3>
+{% extends "base.html" %}
+{%block content %}
+<div class="container mt-5">
+	<div class="col-md-6">
+		<div class="p-4 mb-4  text-center">
+			<h5>Welcome {{user.name}}</h5>
+			<p>This is a nice text message displayed using Bootstrap utility classes.</p>
+		</div>
+	</div>
 </div>
-</body>
-</html>
+
+<div class="container mt-5">
+	<div class="row justify-content-center">
+		<div class="col-md-6">
+			<div class="card text-center">
+				<div class="card-body">
+					<h5 class="card-title">Upload Video</h5>
+					<p class="card-text">Click the button below to upload your video.</p>
+					<button type="button" class="btn btn-primary">Upload Video</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+{%endblock content%}
