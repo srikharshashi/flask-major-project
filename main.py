@@ -1,8 +1,7 @@
 import uuid
 from pyrebase import pyrebase
-from flask import Flask, flash, redirect, render_template, request, abort, url_for,flash
+from flask import Flask, flash, redirect, render_template, request, abort, url_for,flash,session
 from werkzeug.utils import secure_filename
-import json
 import config
 from savethumbnail import upload_video_and_thumbnail
 
@@ -18,13 +17,13 @@ firebase = pyrebase.initialize_app(config.config)
 auth = firebase.auth()
 db = firebase.database()
 storage = firebase.storage()
-# Init  ialze person as dictionary
-person = {"is_logged_in": False, "name": "", "email": "", "uid": ""}
 
 @app.route("/logout")
 def logout():
-    global person
-    person = {"is_logged_in": False, "name": "", "email": "", "uid": ""}
+    session.pop("name",default=None)
+    session.pop("is_logged_in",default=None)
+    session.pop("email",default=None)
+    session.pop("uid",default=None)
     return redirect(url_for("welcome"))
 
 # Login
@@ -42,9 +41,11 @@ def signup():
 # Welcome page
 @app.route("/")
 def welcome():
-    if person["is_logged_in"] == True:
-        videos=db.child("users").child(person["uid"]).child("videos").get()
-        return render_template("welcome.html", email=person["email"], name=person["name"],user = person,videos=videos)
+    if "is_logged_in" in session and session["is_logged_in"]== "True":
+        videos=db.child("users").child(session["uid"]).child("videos").get()
+        if(videos.each() is None or len(videos.each())<=0):
+            videos=None
+        return render_template("welcome.html", email=session["email"], name=session["name"],videos=videos)
     else:
         return redirect(url_for('login'))
 
@@ -59,23 +60,21 @@ def result():
         try:
             # Try signing in the user with the given information
             user = auth.sign_in_with_email_and_password(email, password)
-            print(user)
-            # Insert the user data in the global person
-            global person
-            person["is_logged_in"] = True
-            person["email"] = user["email"]
-            person["uid"] = user["localId"]
+            session["is_logged_in"] = "True"
+            session["email"] = user["email"]
+            session["uid"] = user["localId"]
             # Get the name of the user
             data = db.child("users").get()
-            person["name"] = data.val()[person["uid"]]["name"]
+            session["name"] = data.val()[session["uid"]]["name"]
             # Redirect to welcome page
             return redirect(url_for('welcome'))
         except Exception as e:
             print(e)
             # If there is any error, redirect back to login
+            
             return redirect(url_for('login'))
     else:
-        if person["is_logged_in"] == True:
+        if "is_logged_in" in session and session["is_logged_in"] == "True":
             return redirect(url_for('welcome'))
         else:
             return redirect(url_for('login'))
@@ -94,15 +93,13 @@ def register():
             auth.create_user_with_email_and_password(email, password)
             # Login the user
             user = auth.sign_in_with_email_and_password(email, password)
-            # Add data to global person
-            global person
-            person["is_logged_in"] = True
-            person["email"] = user["email"]
-            person["uid"] = user["localId"]
-            person["name"] = name
+            session["is_logged_in"] = "True"
+            session["email"] = user["email"]
+            session["uid"] = user["localId"]
+            session["name"] = name
             # Append data to the firebase realtime database
             data = {"name": name, "email": email}
-            db.child("users").child(person["uid"]).set(data)
+            db.child("users").child(session["uid"]).set(data)
             # Go to welcome page
             return redirect(url_for('welcome'))
         except Exception  as e:
@@ -111,14 +108,14 @@ def register():
             return redirect(url_for('register'))
 
     else:
-        if person["is_logged_in"] == True:
+        if "is_logged_in" in session and session["is_logged_in"] == "True":
             return redirect(url_for('welcome'))
         else:
             return redirect(url_for('register'))
 
 @app.route('/upload', methods=['GET', 'POST'])
 def upload():
-    if not person["uid"]:
+    if "uid" not in session:
         return redirect(url_for('login'))
     if request.method == 'POST':
         video = request.files['video']
@@ -128,7 +125,7 @@ def upload():
             flash("No Video was selected",'error')
         else:
             filename = secure_filename(video.filename)
-            upload_video_and_thumbnail(video_file=video,filename=filename,storage=storage,database=db,user=person,video_id=str(uuid.uuid4()))
+            upload_video_and_thumbnail(video_file=video,filename=filename,storage=storage,database=db,user=session,video_id=str(uuid.uuid4()))
             flash("Uploading to DB Sucess!",'success')
     elif request.method == 'GET':
         return render_template('upload_video.html')

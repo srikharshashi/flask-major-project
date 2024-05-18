@@ -5,7 +5,7 @@
 	<div class="row justify-content-center">
 		<div class="col-md-6">
 			<div class="p-4 mb-4  text-center">
-				<h5>Welcome {{user.name}}</h5>
+				<h5>Welcome {{name}}</h5>
 				<p>This is a nice text message displayed using Bootstrap utility classes.</p>
 			</div>
 		</div>
@@ -15,9 +15,10 @@
 
 
 <div class="container mt-5">
-	<div class="row justify-content-center">
-		<h3>Your Videos!</h3>
+	<div class="row justify-content-center">	
 		<div class="row">
+			{% if videos %}
+			<h3>Your Videos!</h3>
 			{% for video in videos.each() %}
 			<div class="col-md-4 col-sm-5">
 				<div class="thumbnail m-1">
@@ -29,6 +30,21 @@
 				</div>
 			</div>
 			{% endfor %}
+			{% else %}
+			<div class="card">
+				<div class="card-header">
+				  Some thing Intresting for you !
+				</div>
+				<h5 class="card-title" style="color: red;">Looks Kinda Empty We see?</h5>
+				<div class="card-body">
+				  <blockquote class="blockquote mb-0">
+					<p>I have two lives, and all the problems I might have, I feel like I drop them once I step on to the match court</p>
+					<footer class="blockquote-footer"><cite title="Source Title">Roger Federer
+					</cite></footer>
+				  </blockquote>
+				</div>
+			  </div>
+			{%endif%}
 		</div>
 	</div>
 </div>
