@@ -1,4 +1,4 @@
-import pyrebase
+from pyrebase import pyrebase
 from flask import Flask, flash, redirect, render_template, request, session, abort, url_for
 from dotenv import load_dotenv
 import os
@@ -20,15 +20,14 @@ config = {
 firebase = pyrebase.initialize_app(config)
 auth = firebase.auth()
 db = firebase.database()
-
+storage = firebase.storage()
 # Initialze person as dictionary
 person = {"is_logged_in": False, "name": "", "email": "", "uid": ""}
 
 
 # Login
-@app.route("/")
+@app.route("/login")
 def login():
-    print("key",os.getenv('APIKEY'))
     return render_template("login.html")
 
 
@@ -39,10 +38,10 @@ def signup():
 
 
 # Welcome page
-@app.route("/welcome")
+@app.route("/")
 def welcome():
     if person["is_logged_in"] == True:
-        return render_template("welcome.html", email=person["email"], name=person["name"])
+        return render_template("welcome.html", email=person["email"], name=person["name"],user = person)
     else:
         return redirect(url_for('login'))
 
@@ -113,6 +112,7 @@ def register():
             return redirect(url_for('welcome'))
         else:
             return redirect(url_for('register'))
+
 
 
 if __name__ == "__main__":
