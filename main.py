@@ -104,6 +104,7 @@ def register():
             return redirect(url_for('welcome'))
         except Exception  as e:
             print(e)
+            print(e["error"]["message"])
             # If there is any error, redirect to register
             return redirect(url_for('register'))
 

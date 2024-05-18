@@ -16,9 +16,9 @@
 
 <div class="container mt-5">
 	<div class="row justify-content-center">	
+		{% if videos %}
+		<h3>Your Videos!</h3>
 		<div class="row">
-			{% if videos %}
-			<h3>Your Videos!</h3>
 			{% for video in videos.each() %}
 			<div class="col-md-4 col-sm-5">
 				<div class="thumbnail m-1">
