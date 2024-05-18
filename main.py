@@ -1,29 +1,31 @@
+import uuid
 from pyrebase import pyrebase
-from flask import Flask, flash, redirect, render_template, request, session, abort, url_for
-from dotenv import load_dotenv
-import os
+from flask import Flask, flash, redirect, render_template, request, session, abort, url_for,flash
+from werkzeug.utils import secure_filename
+import json
+import config
+from savethumbnail import upload_video_and_thumbnail
+
 app = Flask(__name__)  # Initialze flask constructor
 app.debug = True
-load_dotenv()
-# Add your own details
-config = {
-  "apiKey": os.getenv("APIKEY"),
-  "authDomain": os.getenv("AUTHDOMAIN"),
-  "databaseURL": os.getenv('DBURL'),
-  "projectId": os.getenv('PRJID'),
-  "storageBucket": os.getenv('STRGBUCKET'),
-  "messagingSenderId": os.getenv('MSGID'),
-  "appId": os.getenv('APPID'),
-}
+app.secret_key="abcd"
+# app.config['SESSION_TYPE'] = 'filesystem'
+
+
 
 # initialize firebase
-firebase = pyrebase.initialize_app(config)
+firebase = pyrebase.initialize_app(config.config)
 auth = firebase.auth()
 db = firebase.database()
 storage = firebase.storage()
-# Initialze person as dictionary
+# Init  ialze person as dictionary
 person = {"is_logged_in": False, "name": "", "email": "", "uid": ""}
 
+@app.route("/logout")
+def logout():
+    global person
+    person = {"is_logged_in": False, "name": "", "email": "", "uid": ""}
+    return redirect(url_for("welcome"))
 
 # Login
 @app.route("/login")
@@ -41,7 +43,8 @@ def signup():
 @app.route("/")
 def welcome():
     if person["is_logged_in"] == True:
-        return render_template("welcome.html", email=person["email"], name=person["name"],user = person)
+        videos=db.child("users").child(person["uid"]).child("videos").get()
+        return render_template("welcome.html", email=person["email"], name=person["name"],user = person,videos=videos)
     else:
         return redirect(url_for('login'))
 
@@ -113,6 +116,23 @@ def register():
         else:
             return redirect(url_for('register'))
 
+@app.route('/upload', methods=['GET', 'POST'])
+def upload():
+    if not person["uid"]:
+        return redirect(url_for('login'))
+    if request.method == 'POST':
+        video = request.files['video']
+        print(video)
+        if not video:
+            print("No Video was selected")
+            flash("No Video was selected",'error')
+        else:
+            filename = secure_filename(video.filename)
+            upload_video_and_thumbnail(video_file=video,filename=filename,storage=storage,database=db,user=person,video_id=str(uuid.uuid4()))
+            flash("Uploading to DB Sucess!",'success')
+    elif request.method == 'GET':
+        return render_template('upload_video.html')
+    return redirect(url_for('welcome'))
 
 
 if __name__ == "__main__":

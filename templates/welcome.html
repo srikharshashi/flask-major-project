@@ -1,26 +1,38 @@
 {% extends "base.html" %}
 {%block content %}
-<div class="container mt-5">
-	<div class="col-md-6">
-		<div class="p-4 mb-4  text-center">
-			<h5>Welcome {{user.name}}</h5>
-			<p>This is a nice text message displayed using Bootstrap utility classes.</p>
-		</div>
-	</div>
-</div>
 
 <div class="container mt-5">
 	<div class="row justify-content-center">
 		<div class="col-md-6">
-			<div class="card text-center">
-				<div class="card-body">
-					<h5 class="card-title">Upload Video</h5>
-					<p class="card-text">Click the button below to upload your video.</p>
-					<button type="button" class="btn btn-primary">Upload Video</button>
-				</div>
+			<div class="p-4 mb-4  text-center">
+				<h5>Welcome {{user.name}}</h5>
+				<p>This is a nice text message displayed using Bootstrap utility classes.</p>
 			</div>
 		</div>
 	</div>
+
+</div>
+
+
+<div class="container mt-5">
+	<div class="row justify-content-center">
+		<h3>Your Videos!</h3>
+		<div class="row">
+			{% for video in videos.each() %}
+			<div class="col-md-4 col-sm-5">
+				<div class="thumbnail m-1">
+					<a href="">
+						<img src="{{ video.val()['thumbnail_url'] }}" alt="{{ video.val()['name'] }}" class="img-fluid"
+							height="auto" width="100%">
+						<div class="overlay">▶️</div>
+					</a>
+				</div>
+			</div>
+			{% endfor %}
+		</div>
+	</div>
+</div>
+
 </div>
 
 {%endblock content%}
