@@ -1,6 +1,6 @@
 import uuid
 from pyrebase import pyrebase
-from flask import Flask, flash, redirect, render_template, request, session, abort, url_for,flash
+from flask import Flask, flash, redirect, render_template, request, abort, url_for,flash
 from werkzeug.utils import secure_filename
 import json
 import config

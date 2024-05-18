@@ -1,14 +1,18 @@
-# Python-Firebase-Flask login/register web-app
+# Auto Umpring for Tennis backend
 
 ## Features
 1) Login/Sign up - Hosted on firebase
-2) Fully responsive UI - Credits: https://codepen.io/danzawadzki/pen/EgqKRr
+2) Fully responsive UI 
 3) Based on Python-Flask
 
 ## Requirements
 ```bash
 pip install pyrebase4
 pip install flask
+pip install firebase-admin
+pip install dotenv
+pip install werkzeug
+pip install moviepy
 ```
 
 ## Setting up firebase
