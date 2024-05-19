@@ -1,9 +1,9 @@
-body{
+body {
 	margin: 0;
 	background-color: #212121;
 }
 
-.main{
+.main {
 	width: 60vw;
 	padding-top: 100px;
 	padding-bottom: 100px;
@@ -13,13 +13,33 @@ body{
 	margin-left: 20vw;
 }
 
-.name{
+.name {
 	font-size: 300%;
 	font-family: monospace;
 }
 
-.email{
+.email {
 	font-size: 150%;
 	color: #404040;
 	font-family: monospace;
+}
+
+.overlay {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0, 0, 0, 0.5);
+	text-align: center;
+	line-height: 200px;
+	/* Adjust this value to center the emoji vertically */
+}
+
+.thumbnail {
+	position: relative;
+	width: 100%;
+	/* Adjust this value to set the width of the image */
+	height: auto;
+	/* Adjust this value to set the height of the image */
 }

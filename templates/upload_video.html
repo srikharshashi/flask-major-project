@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{%block content %}
+<div class="container mt-5">
+	<div class="row justify-content-center">
+		<div class="col-md-6">
+			<div class="card text-center">
+				<div class="card-body">
+					<form action="{{ url_for('upload') }}" method="post" enctype="multipart/form-data">
+						<h3 class="card-title">Upload Video</h3>
+						<div class="form-group mb-3 custom-file">
+							<input type="file" class="custom-file-input" name="video" id="formFile" accept="video/*"
+								aria-describedby="fileHelpId">
+							<label for="formFile" class="custom-file-label"></label>
+							<input type="submit" value="Upload" class="btn btn-primary">
+						</div>
+					</form>
+
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+{%endblock content%}
