@@ -1,26 +1,37 @@
 from pyrebase import pyrebase
-from flask import Flask, flash, redirect, render_template, request, session, abort, url_for
+from flask import (
+    Flask,
+    flash,
+    redirect,
+    render_template,
+    request,
+    session,
+    abort,
+    url_for,
+)
 from dotenv import load_dotenv
 import os
+from firebase_admin import storage
+
 app = Flask(__name__)  # Initialze flask constructor
 app.debug = True
 load_dotenv()
 # Add your own details
 config = {
-  "apiKey": os.getenv("APIKEY"),
-  "authDomain": os.getenv("AUTHDOMAIN"),
-  "databaseURL": os.getenv('DBURL'),
-  "projectId": os.getenv('PRJID'),
-  "storageBucket": os.getenv('STRGBUCKET'),
-  "messagingSenderId": os.getenv('MSGID'),
-  "appId": os.getenv('APPID'),
+    "apiKey": os.getenv("APIKEY"),
+    "authDomain": os.getenv("AUTHDOMAIN"),
+    "databaseURL": os.getenv("DBURL"),
+    "projectId": os.getenv("PRJID"),
+    "storageBucket": os.getenv("STRGBUCKET"),
+    "messagingSenderId": os.getenv("MSGID"),
+    "appId": os.getenv("APPID"),
 }
 
 # initialize firebase
 firebase = pyrebase.initialize_app(config)
 auth = firebase.auth()
 db = firebase.database()
-storage = firebase.storage()
+# storage = firebase.storage()
 # Initialze person as dictionary
 person = {"is_logged_in": False, "name": "", "email": "", "uid": ""}
 
@@ -41,9 +52,11 @@ def signup():
 @app.route("/")
 def welcome():
     if person["is_logged_in"] == True:
-        return render_template("welcome.html", email=person["email"], name=person["name"],user = person)
+        return render_template(
+            "welcome.html", email=person["email"], name=person["name"], user=person
+        )
     else:
-        return redirect(url_for('login'))
+        return redirect(url_for("login"))
 
 
 # If someone clicks on login, they are redirected to /result
@@ -66,16 +79,16 @@ def result():
             data = db.child("users").get()
             person["name"] = data.val()[person["uid"]]["name"]
             # Redirect to welcome page
-            return redirect(url_for('welcome'))
+            return redirect(url_for("welcome"))
         except Exception as e:
             print(e)
             # If there is any error, redirect back to login
-            return redirect(url_for('login'))
+            return redirect(url_for("login"))
     else:
         if person["is_logged_in"] == True:
-            return redirect(url_for('welcome'))
+            return redirect(url_for("welcome"))
         else:
-            return redirect(url_for('login'))
+            return redirect(url_for("login"))
 
 
 # If someone clicks on register, they are redirected to /register
@@ -101,19 +114,33 @@ def register():
             data = {"name": name, "email": email}
             db.child("users").child(person["uid"]).set(data)
             # Go to welcome page
-            return redirect(url_for('welcome'))
-        except Exception  as e:
+            return redirect(url_for("welcome"))
+        except Exception as e:
             print(e)
             # If there is any error, redirect to register
-            return redirect(url_for('register'))
+            return redirect(url_for("register"))
 
     else:
         if person["is_logged_in"] == True:
-            return redirect(url_for('welcome'))
+            return redirect(url_for("welcome"))
         else:
-            return redirect(url_for('register'))
+            return redirect(url_for("register"))
 
-
+@app.route('/upload', methods=['GET', 'POST'])
+def upload_video():
+    if request.method == 'POST':
+        video = request.files['video']
+        if video:
+            # Save the file locally first
+            upload_path = os.path.join('uploads', video.filename)
+            video.save(upload_path)
+            # Upload to Firebase Storage
+            storage.child(f"videos/{video.filename}").put(upload_path)
+            flash('Video uploaded successfully!', 'success')
+        else:
+            flash('No file selected', 'error')
+    return render_template('welcome.html')
 
 if __name__ == "__main__":
-    app.run()
+    os.makedirs('uploads', exist_ok=True)
+    app.run(debug=True)

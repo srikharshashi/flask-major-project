@@ -16,11 +16,16 @@
 				<div class="card-body">
 					<h5 class="card-title">Upload Video</h5>
 					<p class="card-text">Click the button below to upload your video.</p>
-					<button type="button" class="btn btn-primary">Upload Video</button>
+					<form action="{{ url_for('upload_video') }}" method="POST" enctype="multipart/form-data">
+						<input type="file" name="video" accept="video/*" required>
+						<button type="submit">Upload Video</button>
+					</form>
 				</div>
 			</div>
 		</div>
 	</div>
 </div>
+
+
 
 {%endblock content%}
