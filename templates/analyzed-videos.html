@@ -1,28 +1,16 @@
 {% extends "base.html" %}
 {%block content %}
 
-<div class="container mt-5">
-	<div class="row justify-content-center">
-		<div class="col-md-6">
-			<div class="p-4 mb-4  text-center">
-				<h5>Welcome {{name}}</h5>
-				<p>This is a nice text message displayed using Bootstrap utility classes.</p>
-			</div>
-		</div>
-	</div>
-
-</div>
-
 
 <div class="container mt-5">
 	<div class="row justify-content-center">	
 		{% if videos %}
-		<h3>Your Videos!</h3>
+		<h3>Analyzed Videos!</h3>
 		<div class="row">
-			{% for video in videos.each() %}
+			{% for video in videos %}
 			<div class="col-md-4 col-sm-5">
 				<div class="thumbnail m-1">
-					<a href="{{video.val()['video_url']}}">
+					<a href="{{video.val()['processed_url']}}">
 						<img src="{{ video.val()['thumbnail_url'] }}" alt="{{ video.val()['name'] }}" class="img-fluid"
 							height="auto" width="100%">
 						<div class="overlay">▶️</div>
@@ -47,8 +35,6 @@
 			{%endif%}
 		</div>
 	</div>
-</div>
-
 </div>
 
 {%endblock content%}

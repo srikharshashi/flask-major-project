@@ -8,11 +8,16 @@
 					<form action="{{ url_for('upload') }}" method="post" enctype="multipart/form-data">
 						<h3 class="card-title">Upload Video</h3>
 						<div class="form-group mb-3 custom-file">
-							<input type="file" class="custom-file-input" name="video" id="formFile" accept="video/*"
+							<input type="file" class="custom-file-input" name="video1" id="formFile1" accept="video/*"
 								aria-describedby="fileHelpId">
-							<label for="formFile" class="custom-file-label"></label>
-							<input type="submit" value="Upload" class="btn btn-primary">
+							<label for="formFile1" class="custom-file-label"></label>
 						</div>
+						<div class="form-group mb-3 custom-file">
+							<input type="file" class="custom-file-input" name="video2" id="formFile2" accept="video/*"
+								aria-describedby="fileHelpId">
+							<label for="formFile2" class="custom-file-label"></label>
+						</div>
+						<input type="submit" value="Upload" class="btn btn-primary">
 					</form>
 
 				</div>

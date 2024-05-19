@@ -28,6 +28,7 @@
                     <!-- Navbar Right Side -->
                     <div class="navbar-nav">
                         {% if session["uid"] %}
+                        <a class="nav-item nav-link" href="analyzed">Analyzed Videos</a>
                         <a class="nav-item nav-link" href="#">Profile</a>
                         <a class="nav-item nav-link" href="logout">Logout</a>
                         {%else %}

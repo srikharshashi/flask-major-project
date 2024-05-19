@@ -4,13 +4,18 @@ from flask import Flask, flash, redirect, render_template, request, abort, url_f
 from werkzeug.utils import secure_filename
 import config
 from savethumbnail import upload_video_and_thumbnail
+from my_utils.inference import infer
+from my_utils.writefile import write_video_file
+from flask_executor import Executor
+import copy
+import sys
+sys.setrecursionlimit(100000000)  
 
 app = Flask(__name__)  # Initialze flask constructor
+executor = Executor(app)
+
 app.debug = True
 app.secret_key="abcd"
-# app.config['SESSION_TYPE'] = 'filesystem'
-
-
 
 # initialize firebase
 firebase = pyrebase.initialize_app(config.config)
@@ -119,18 +124,38 @@ def upload():
     if "uid" not in session:
         return redirect(url_for('login'))
     if request.method == 'POST':
-        video = request.files['video']
-        print(video)
-        if not video:
+        if 'video1' not in request.files or 'video2' not in request.files:
+            flash("Sorry, the upload didn't send all of the data!","error")
+            return redirect(request.url)
+        video1 = request.files['video1']
+        video2=request.files['video2']
+        print(video1)
+        print(video2)
+        if not video1 or not video2:
             print("No Video was selected")
             flash("No Video was selected",'error')
         else:
-            filename = secure_filename(video.filename)
-            upload_video_and_thumbnail(video_file=video,filename=filename,storage=storage,database=db,user=session,video_id=str(uuid.uuid4()))
+            video_id=str(uuid.uuid4())
+            # video2=copy.deepcopy(video1)
+            video_path=write_video_file(video_file=video1,output_path=f"./inputs/{video_id}.mp4")
+            # print(video)
+            filename = secure_filename(video2.filename)
+            upload_video_and_thumbnail(video_file=video2,filename=filename,storage=storage,database=db,user=session,video_id=video_id)
+            executor.submit(infer,video_path,storage,db,session,video_id)
             flash("Uploading to DB Sucess!",'success')
     elif request.method == 'GET':
         return render_template('upload_video.html')
     return redirect(url_for('welcome'))
+
+@app.route("/analyzed",methods=["GET"])
+def analyzed():
+    videos=db.child("users").child(session["uid"]).child("videos").get()
+    print(videos)
+    analyzed_videos=[]
+    for video in videos.each():
+        if "processed_url" in video.val():
+            analyzed_videos.append(video)
+    return render_template("analyzed-videos.html",videos=analyzed_videos)
 
 
 if __name__ == "__main__":
