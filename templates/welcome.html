@@ -14,37 +14,47 @@
 </div>
 
 
-<div class="container mt-5">
-	<div class="row justify-content-center">	
+<div class="container mt-5" style=" max-width: 1700px;">
+	<div class="row justify-content-center">
 		{% if videos %}
 		<h3>Your Videos!</h3>
-		<div class="row">
-			{% for video in videos.each() %}
-			<div class="col-md-4 col-sm-5">
-				<div class="thumbnail m-1">
-					<a href="">
-						<img src="{{ video.val()['thumbnail_url'] }}" alt="{{ video.val()['name'] }}" class="img-fluid"
-							height="auto" width="100%">
-						<div class="overlay">▶️</div>
-					</a>
+
+		<div class="container" style="max-width: 3500px; height: 500px; overflow: auto;">
+
+
+
+			<div class="row">
+				{% for video in videos %}
+				<div class="col-md-4 col-sm-5">
+					<div class="thumbnail m-1">
+						<!-- <a href="{{ url_for('play_video', video_url = video.val()['video_url']) }}">		 -->
+											<a href="{{video.val()['video_url']}}" target="_blank"> 
+							<!-- <a href="/video/{{video.val()['video_url']}}"></a> -->
+							<img 
+								src="{{ video.val()['thumbnail_url'] }}" alt="{{ video.val()['name'] }}" 
+								class="img-fluid" height="auto" width="100%">
+							<div class="overlay">▶️</div>
+						</a>
+					</div>
 				</div>
+				{% endfor %}
+				{% else %}
+				<div class="card">
+					<div class="card-header">
+						Some thing Intresting for you !
+					</div>
+					<h5 class="card-title" style="color: red;">Looks Kinda Empty We see?</h5>
+					<div class="card-body">
+						<blockquote class="blockquote mb-0">
+							<p>I have two lives, and all the problems I might have, I feel like I drop them once I step
+								on to the match court</p>
+							<footer class="blockquote-footer"><cite title="Source Title">Roger Federer
+								</cite></footer>
+						</blockquote>
+					</div>
+				</div>
+				{%endif%}
 			</div>
-			{% endfor %}
-			{% else %}
-			<div class="card">
-				<div class="card-header">
-				  Some thing Intresting for you !
-				</div>
-				<h5 class="card-title" style="color: red;">Looks Kinda Empty We see?</h5>
-				<div class="card-body">
-				  <blockquote class="blockquote mb-0">
-					<p>I have two lives, and all the problems I might have, I feel like I drop them once I step on to the match court</p>
-					<footer class="blockquote-footer"><cite title="Source Title">Roger Federer
-					</cite></footer>
-				  </blockquote>
-				</div>
-			  </div>
-			{%endif%}
 		</div>
 	</div>
 </div>

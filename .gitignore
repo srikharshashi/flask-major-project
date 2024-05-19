@@ -1,3 +1,5 @@
 .env
+major_env
+uploads/
 __pycache__
 tempCodeRunnerFile.py
