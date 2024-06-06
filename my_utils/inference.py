@@ -1,7 +1,6 @@
-import time
-from yolov5 import detect
 import os
 import subprocess
+from tennis_analysis.my_infer import model_infer
 BASE_PATH="/home/shashi/python-firebase-flask-login"
 
 def convert_video(input_path, output_path):
@@ -22,24 +21,25 @@ def write_video_file(video_file, output_path):
         raise Exception('File was not written correctly')
     return output_path
 
-def infer(in_path,storage,db,session,video_id):
-    weights='yolov5s-base.pt'
+def util_infer(in_path,storage,db,session,video_id):
     print("In Infer method")
+     # Out path
+    out_path=BASE_PATH+"/outputs/"+"conv-"+f"{video_id}.webm"
     # Run detect 
-    detect.run(weights=weights,source=in_path,project="./outputs",name="runs",exist_ok=True)
-    # Out path
-    out_path="/outputs/runs/"+f"{video_id}.mp4"
+    model_infer(input_video_path=in_path,output_video_path=out_path)
+    print("done inference")
     # Change Codec 
-    convert_video(BASE_PATH+out_path,BASE_PATH+"/outputs/runs/"+f"conv-{video_id}.mp4")
+    new_out=BASE_PATH+"/outputs/"+f"conv-{video_id}.webm"
+    # convert_video(BASE_PATH+out_path,BASE_PATH+"/outputs/"+f"conv-{video_id}.mp4")
     print("Video Converted")
-    # Chnage out path
-    out_path="./outputs/runs/"+f"conv-{video_id}.mp4"
+    # # Chnage out path
+    # out_path="./outputs/"+f"conv-{video_id}.mp4"
     # Upload the output video to Pyrebase
-    storage.child(f"output_videos/{video_id}.mp4").put(out_path)   
+    storage.child(f"output_videos/{video_id}.webm").put(new_out)   
     print("Output video uploaded to Pyrebase")
 
     #  Get the download URL of the output video
-    video_url= storage.child(f"output_videos/{video_id}.mp4").get_url(None)
+    video_url= storage.child(f"output_videos/{video_id}.webm").get_url(None)
     print("Video URL:", video_url)
 
     #  Store the video URL in Firebase Realtime Database

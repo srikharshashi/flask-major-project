@@ -4,5 +4,12 @@ tempCodeRunnerFile.py
 /outputs
 /yolov5
 yolov5s-base.pt
+yolov8x.pt
 /inputs
 /outputs
+/tennis_analysis/models
+/tennis_analysis/__pycache__
+/tennis_analysis/input_videos
+/tennis_analysis/output_videos
+/tennis_analysis/runs
+*/__pycache__

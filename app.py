@@ -3,12 +3,14 @@ from pyrebase import pyrebase
 from flask import Flask, flash, redirect, render_template, request, abort, url_for,flash,session
 from werkzeug.utils import secure_filename
 import config
-from savethumbnail import upload_video_and_thumbnail
-from my_utils.inference import infer
+from my_utils.savethumbnail import upload_video_and_thumbnail
+from my_utils.inference import util_infer
 from my_utils.writefile import write_video_file
 from flask_executor import Executor
-import copy
+import os
 import sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + "/tennis_analysis/utils")
+
 sys.setrecursionlimit(100000000)  
 
 app = Flask(__name__)  # Initialze flask constructor
@@ -131,21 +133,26 @@ def upload():
         video2=request.files['video2']
         print(video1)
         print(video2)
-        if not video1 or not video2:
-            print("No Video was selected")
-            flash("No Video was selected",'error')
-        else:
-            video_id=str(uuid.uuid4())
-            # video2=copy.deepcopy(video1)
-            video_path=write_video_file(video_file=video1,output_path=f"./inputs/{video_id}.mp4")
-            # print(video)
-            filename = secure_filename(video2.filename)
-            upload_video_and_thumbnail(video_file=video2,filename=filename,storage=storage,database=db,user=session,video_id=video_id)
-            executor.submit(infer,video_path,storage,db,session,video_id)
-            flash("Uploading to DB Sucess!",'success')
+        try:
+            if not video1 or not video2:
+                print("No Video was selected")
+                flash("No Video was selected",'error')
+            else:
+                video_id=str(uuid.uuid4())
+                # video2=copy.deepcopy(video1)
+                video_path=write_video_file(video_file=video1,output_path=f"./inputs/{video_id}.mp4")
+                # print(video)
+                filename = secure_filename(video2.filename)
+                upload_video_and_thumbnail(video_file=video2,filename=filename,storage=storage,database=db,user=session,video_id=video_id)
+                executor.submit(util_infer,video_path,storage,db,session,video_id)
+                flash("Uploading to DB Sucess!",'success')
+        except Exception as e:
+            print(e)
     elif request.method == 'GET':
-        return render_template('upload_video.html')
+            return render_template('upload_video.html')
     return redirect(url_for('welcome'))
+        
+    
 
 @app.route("/analyzed",methods=["GET"])
 def analyzed():
